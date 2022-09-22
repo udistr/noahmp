@@ -10738,6 +10738,14 @@ END SUBROUTINE CO2FLUX_CROP
    IPA = 1
    IHA = 1
 
+IF (parameters%PLTDAY > parameters%HSDAY) THEN
+!turn on/off the planting  
+   IF(JULIAN >= parameters%HSDAY .and. JULIAN < parameters%PLTDAY) THEN
+     IPA = 0
+     IHA = 0
+   END IF
+ELSE
+
 !turn on/off the planting 
  
    IF(JULIAN < parameters%PLTDAY)  IPA = 0
@@ -10790,9 +10798,18 @@ END SUBROUTINE CO2FLUX_CROP
 
    IF(GDDDAY >= parameters%GDDS5)  PGS = 7
 
-   IF(JULIAN >= parameters%HSDAY)  PGS = 8
+   IF (parameters%PLTDAY < parameters%HSDAY) THEN
+     IF(JULIAN >= parameters%HSDAY)  PGS = 8
  
-   IF(JULIAN <  parameters%PLTDAY) PGS = 1   
+     IF(JULIAN <  parameters%PLTDAY) PGS = 1   
+   ELSE   
+     IF(JULIAN >=  parameters%HSDAY .and. JULIAN < parameters%PLTDAY) THEN 
+! define beginning of the season at the middle between harvet and planting dates     
+       IF (JULIAN >= ((parameters%HSDAY + parameters%PLTDAY) / 2.0)) PGS = 1
+
+       IF (JULIAN <  ((parameters%HSDAY + parameters%PLTDAY) / 2.0)) PGS = 8
+     END IF
+   END IF
 
 END SUBROUTINE GROWING_GDD
 
